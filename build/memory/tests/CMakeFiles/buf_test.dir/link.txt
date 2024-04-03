@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/buf_test.dir/__/__/log/pr.cpp.o CMakeFiles/buf_test.dir/__/__/log/log.cpp.o CMakeFiles/buf_test.dir/__/chunk.cpp.o CMakeFiles/buf_test.dir/__/data_buf.cpp.o CMakeFiles/buf_test.dir/__/mem_pool.cpp.o CMakeFiles/buf_test.dir/test_buf.cpp.o -o buf_test  -lpthread

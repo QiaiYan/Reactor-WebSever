@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/q_test.dir/test_q.cpp.o CMakeFiles/q_test.dir/__/pr.cpp.o -o q_test  -lpthread
