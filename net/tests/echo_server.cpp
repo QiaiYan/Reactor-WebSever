@@ -21,6 +21,7 @@ public:
     void set_tcp_cn_timeout_ms(int ms) { es_server.set_tcp_conn_timeout_ms(ms); }
 
 private:
+    //定义该服务器的回调函数
     void echo_conneted_cb(const TcpConnSP& conn) {
         PR_INFO("one connected! peer addr is %s, local socket fd is %d\n", conn->get_peer_addr(), conn->get_fd());
     }
@@ -31,7 +32,7 @@ private:
         string msg_str(msg, msg+ibuf->length());
         ibuf->pop(ibuf->length());
         ibuf->adjust();
-    
+        
         PR_INFO("socket fd %d recv message:%s", conn->get_fd(), msg_str.c_str());
 
         conn->send(msg_str.c_str(), msg_str.length());

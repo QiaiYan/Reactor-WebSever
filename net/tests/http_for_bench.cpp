@@ -52,9 +52,9 @@ int main()
     Logger::get_instance()->init(NULL);
 
     EventLoop base_loop;
-    EchoServer server(&base_loop, "127.0.0.1", 8889);
+    EchoServer server(&base_loop, "192.168.58.128", 8889);
     server.set_tcp_cn_timeout_ms(8000);
-    server.start(4);
+    server.start(16);
     base_loop.loop();
     
     return 0;

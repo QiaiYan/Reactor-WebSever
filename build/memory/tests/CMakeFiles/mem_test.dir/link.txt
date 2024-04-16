@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/mem_test.dir/test_mem.cpp.o CMakeFiles/mem_test.dir/__/__/log/pr.cpp.o CMakeFiles/mem_test.dir/__/__/log/log.cpp.o CMakeFiles/mem_test.dir/__/chunk.cpp.o CMakeFiles/mem_test.dir/__/data_buf.cpp.o CMakeFiles/mem_test.dir/__/mem_pool.cpp.o -o mem_test  -lpthread

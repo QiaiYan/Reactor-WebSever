@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/log_sync_test.dir/test_log_sync.cpp.o CMakeFiles/log_sync_test.dir/__/pr.cpp.o CMakeFiles/log_sync_test.dir/__/log.cpp.o -o log_sync_test  -lpthread

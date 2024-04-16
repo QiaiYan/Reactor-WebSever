@@ -1,0 +1,4 @@
+/home/zy/pro2/Reactor/memory/build1/CMakeFiles/mem_test.dir
+/home/zy/pro2/Reactor/memory/build1/CMakeFiles/buf_test.dir
+/home/zy/pro2/Reactor/memory/build1/CMakeFiles/edit_cache.dir
+/home/zy/pro2/Reactor/memory/build1/CMakeFiles/rebuild_cache.dir

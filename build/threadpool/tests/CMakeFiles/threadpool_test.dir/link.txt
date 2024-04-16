@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/threadpool_test.dir/test_threadpool.cpp.o CMakeFiles/threadpool_test.dir/__/__/log/pr.cpp.o CMakeFiles/threadpool_test.dir/__/__/log/log.cpp.o -o threadpool_test  -lpthread

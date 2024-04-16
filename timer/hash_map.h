@@ -35,6 +35,7 @@ public:
         return false;
     }
 
+    //判断键值是否存在
     bool is_key_exist(const K& key) {
         unique_lock<mutex> lck(hm_mutex);
         return hm_map.find(key) != hm_map.end();

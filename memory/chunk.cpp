@@ -4,7 +4,7 @@
 
 #include "chunk.h"
 
-// Chunk类的定义
+// 初始化date的大小为sizes
 Chunk::Chunk(int size) : capacity(size), data(new char[size])
 {
     assert(data); // 确保数据分配成功
@@ -61,4 +61,5 @@ void Chunk::print_data()
         printf("%c", data[i]); // 打印数据缓冲区中的每个字符
     }
     printf("\n"); // 在结尾打印一个换行符
+    return;
 }

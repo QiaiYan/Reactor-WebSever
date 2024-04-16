@@ -1,4 +1,4 @@
-#include "pr.h"  // 包含自定义的头文件 pr.h，用于引入自定义的函数和变量
+#include "pr.h" 
 
 int pr_level = PR_LEVEL_INFO;  // 初始化日志级别变量为 PR_LEVEL_INFO
 

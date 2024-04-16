@@ -16,27 +16,30 @@
 
 using namespace std;
 
+//参数分别为接受器所属服务器对象，所属事件循环（该循环用来处理连接事件），服务器对应的ip,端口号
 Acceptor::Acceptor(TcpServer* server, EventLoop* loop, const char *ip, uint16_t port)
     : ac_server(server),
       ac_loop(loop),
       ac_listening(false),
       ac_idle_fd(open("/dev/null", O_RDONLY | O_CLOEXEC)),
-      ac_listen_fd(socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP))
+      ac_listen_fd(socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP))  //用于监听的文件描述符
 {
 LOG_INFO("create one acceptor, listen fd is %d\n", ac_listen_fd);
     assert(ac_listen_fd >= 0);
     assert(ac_idle_fd >= 0);
 
     int op = 1;
+    //设置端口复用
     if (setsockopt(ac_listen_fd, SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op)) < 0) {
         PR_ERROR("set listen socket SO_REUSEADDR failed!\n");
     }
-
+    //服务器地址结构体
     memset(&ac_server_addr, 0, sizeof(ac_server_addr));
     ac_server_addr.sin_family = AF_INET;
     inet_aton(ip, &ac_server_addr.sin_addr);
     ac_server_addr.sin_port = htons(port);
-
+    
+    //将套接字与服务器的ip和地址绑定
 LOG_INFO("acceptor bind, ip is %s, port is %d\n", ip, (int)port);
     if (::bind(ac_listen_fd, (const struct sockaddr*)&ac_server_addr, sizeof(ac_server_addr)) < 0) {
         PR_ERROR("bind server port error!\n");
@@ -58,16 +61,19 @@ LOG_INFO("acceptor execute listen, listen fd is %d\n", ac_listen_fd);
         exit(1);
     }
     ac_listening = true;
-    ac_loop->add_to_poller(ac_listen_fd, EPOLLIN, [this](){ this->do_accept(); });
+    //监听文件的读事件的回调函数添加到所属的事件循环  （当监听文件描述符读事件发生，说明此时有连接，应该处理连接）
+    ac_loop->add_to_poller(ac_listen_fd, EPOLLIN, [this](){ this->do_accept(); }); 
 }
 
+//处理连接
 void Acceptor::do_accept()
 {
     int connfd;
-    struct sockaddr_in conn_addr;
+    struct sockaddr_in conn_addr;  //连接的客户端地址
     socklen_t conn_addrlen = sizeof conn_addr;
      while(true) {
         if ((connfd = accept(ac_listen_fd, (struct sockaddr*)&conn_addr, &conn_addrlen))== -1) {
+            //连接失败
             if (errno == EINTR) {
                 PR_ERROR("accept fail, errno=EINTR, continue\n");
                 continue;
@@ -90,14 +96,16 @@ void Acceptor::do_accept()
         }
         else {
 LOG_INFO("accepted one connection, sock fd is %d\n", connfd);
-            EventLoop* sub_loop = ac_server->get_next_loop();
-            
+            EventLoop* sub_loop = ac_server->get_next_loop(); //从服务器中分配事件循环
+            //给新连接设置回调函数（由所属服务器类决定具体的回调函数）
             TcpConnSP conn = make_shared<TcpConnection>(ac_server, sub_loop, connfd, conn_addr, conn_addrlen);
             conn->set_connected_cb(ac_server->ts_connected_cb);
             conn->set_message_cb(ac_server->ts_message_cb);
             conn->set_close_cb(ac_server->ts_close_cb);
+            //将该连接 连接建立后的回调函数以及 它的通信文件描述符读事件触发的回调函数添加到所属的事件循环中
             conn->add_task();
-
+            
+            //服务器添加连接
             lock_guard<mutex> lck(ac_server->ts_mutex);
             ac_server->add_new_tcp_conn(conn);     
         }

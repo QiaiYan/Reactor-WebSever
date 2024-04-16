@@ -103,11 +103,12 @@ Logger::~Logger()
     //设置日志级别
     set_log_level(level);
 
+    //如果设置缓冲队列的缓冲区数量大于1,则表明使用异步写入
     if (buffer_queue_size >= 1)
     {
         l_is_async = true;
-        l_buffer_queue = new buffer_queue<string>(buffer_queue_size);
-        l_asyncw_thread = new thread(&Logger::async_flush);
+        l_buffer_queue = new buffer_queue<string>(buffer_queue_size);  //初始化缓冲队列
+        l_asyncw_thread = new thread(&Logger::async_flush);  //初始化异步写入线程，用于将缓冲队列中的数据写入日志文件中
     }
     
     l_buf_size = buffer_size;   // 设置缓冲区大小
@@ -202,18 +203,20 @@ void Logger::write_log(const char* file_name, const char* tn_callbackname, int l
         }
     }
 
-    va_list valst;
-    va_start(valst, format);
+    va_list valst;  //可变参数列表
+    va_start(valst, format);  //列表的开始位置设置为format
 
     string log_str;
     {
         lock_guard<mutex> lck (l_mutex);;
 
+        //写入数据的前缀：包括写入日期，日志级别,写入文件名，调用该函数的函数名，以及函数所在的行数
         int n = snprintf(l_buf, 300, "%04d-%02d-%02d %02d:%02d:%02d %s [%s:%s:%d] ",
                         my_tm.year, my_tm.month, my_tm.day,
                             my_tm.hour, my_tm.minute, my_tm.second, LogLevelName[level],
                             file_name, tn_callbackname, line_no);
         
+        //将所有可变参数添加到前缀后面
         int m = vsnprintf(l_buf + n, l_buf_size - 1, format, valst);
         l_buf[n + m] = '\n';
         l_buf[n + m + 1] = '\0';
@@ -224,7 +227,8 @@ void Logger::write_log(const char* file_name, const char* tn_callbackname, int l
      //使用异步写入
     if (l_is_async)
     {
-        while (!l_buffer_queue->push(log_str) && !is_thread_stop)   //FIXME: use tm_condvar replacing busy loop
+        //将要写入的数据放在缓冲队列之中，交给异步写入日志线程处理，将数据写入日志文件中
+        while (!l_buffer_queue->push(log_str) && !is_thread_stop)   
         {    
                        
         }
@@ -244,7 +248,7 @@ void Logger::flush(void)
     fflush(l_fp);
 }
 
-//异步写日志
+//异步写日志，将缓冲队列中的数据读读出写入日志文件中
 void* Logger::async_write()
 {
     string single_line;
@@ -253,5 +257,11 @@ void* Logger::async_write()
       lock_guard<mutex> lck (l_mutex);
       fputs(single_line.c_str(), l_fp);
    }
-
+   return NULL;
 }
+/*
+   该异步写入的任务函数存在一定缺陷：
+   比如当缓冲队列的数据被全部取出后该线程的任务就执行完毕然后退出，但是如果此时又有新的日志数据被写入到任务队列中，由于异步写入到文件的线程关闭，新到来的所有日志信息都无法被写入日志文件，造成数据丢失。
+   针对此问题的改进方法：
+   使用任务队列中的条件变量（需要为任务队列再编写一个接口用于获取其私有的条件变量），当任务队列为空时，该线程阻塞等待新日志数据的到来，数据一到来就会被唤醒，将新到来的数据写入日志文件。
+*/

@@ -12,7 +12,7 @@
 
 using namespace std;
 
-// 声明一个模板类 buffer_queue，用于表示一个缓冲队列
+// 声明一个模板类 buffer_queue，用于表示一个缓冲队列，该队列的作用是存储日志写入的数据，
 template <class T>
 class buffer_queue
 {

@@ -2,8 +2,9 @@
 #define __CHUNK_H__
 
 struct Chunk{
-
-    explicit Chunk(int size);
+    
+    //有参数构造
+    explicit Chunk(int size);  
 
     ~Chunk();
 
@@ -15,14 +16,12 @@ struct Chunk{
 
     void pop(int len);
 
-    // api for debug
-    [[deprecated("chunk debug api deprecated!")]]
     void print_data();
 
-    int capacity{ 0 };
-    int length{ 0 };
-    int head{ 0 };
-    char *data{ nullptr };
+    int capacity{ 0 };  //容量
+    int length{ 0 };    //数据长度
+    int head{ 0 };      //当前数据的起始位置的偏移量
+    char *data{ nullptr };  //存储数据
     Chunk *next{ nullptr };
 };
 

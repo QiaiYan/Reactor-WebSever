@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/log_async_test.dir/test_log_async.cpp.o CMakeFiles/log_async_test.dir/__/pr.cpp.o CMakeFiles/log_async_test.dir/__/log.cpp.o -o log_async_test  -lpthread
